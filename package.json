@@ -1,0 +1,19 @@
+{
+  "name": "magic-bus",
+  "version": "0.0.1",
+  "description": "Module for composing higher-order meaning from sensor data",
+  "main": "index.js",
+  "scripts": {
+    "start": "babel-node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-preset-es2015": "6.9.0"
+  },
+  "dependencies": {
+    "ipfs": "0.14.1",
+    "lodash": "4.13.1"
+  }
+}
