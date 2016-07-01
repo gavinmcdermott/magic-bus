@@ -4,6 +4,7 @@ import _ from 'lodash'
 import IPFS from 'ipfs'
 import { exec } from 'child_process'
 import path from 'path'
+import os from 'os'
 
 
 
@@ -21,11 +22,20 @@ import path from 'path'
 // console.log(process.env)
 
 
-let node = new IPFS(__dirname + '/foo')
-
-node.init((err) => {
-  console.log(err)
+let ipfs = new IPFS(os.homedir() + '/.ipfs')
+ipfs.load(() => {
+	ipfs.files.add(
+		new Buffer('hello world!', 'utf8'))
+	.then(function(err, res) {
+		if (err) { console.log(err) }
+		if (res) { console.log(res) }
+	})
+	.catch(function(err) {
+		console.log(err)
+	})
 })
+
+// ipfs.goOnine()
 
 
 
