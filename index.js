@@ -1,39 +1,23 @@
 'use strict'
 
 import _ from 'lodash'
-import IPFS from 'ipfs'
-import { exec } from 'child_process'
-import path from 'path'
+import ipfsApi from 'ipfs-api'
 
+const ipfs = ipfsApi()
 
-
-
-
-
-// console.log(node.isOnline())
-// console.log(node.id)
-
-
-
-// console.log(process.env.IPFS_PATH)
-// process.env.IPFS_PATH = __dirname + '/foo'
-// console.log(process.env.IPFS_PATH)
-// console.log(process.env)
-
-
-let node = new IPFS(__dirname + '/foo')
-
-node.init((err) => {
-  console.log(err)
-})
-
-
-
-
-// exec('jsipfs daemon', (err, stdout, stderr) => {
-//   if (stderr) {
-//     console.error(`exec error: ${stderr}`)
-//     return
-//   }
-//   console.log(stdout)
+// ipfs.block.get('QmZH9H8UG1wcs6481LoDGLnr4MGLZjXjyKxqxXPKzyav92', (e, d) => {
+//   let buf = ''
+//   d
+//     .on('data', function (data) { buf += data })
+//     .on('end', function () {
+//       console.log(buf)
+//     })
 // })
+
+ipfs.add(new Buffer('hello reid!', 'utf8'))
+  .then((data) => {
+    console.log('d: ', data)
+  })
+  .catch((e) => {
+    console.log('e', e)
+  })
