@@ -14,9 +14,11 @@
   },
   "dependencies": {
     "babel-node-debug": "2.0.0",
+    "bs58": "^3.0.0",
     "es6-promisify": "4.1.0",
     "ipfs": "0.14.1",
     "ipfs-api": "6.0.3",
+    "ipfs-merkle-dag": "^0.6.0",
     "lodash": "4.13.1",
     "rimraf": "2.5.2"
   }
