@@ -7,7 +7,7 @@ Devices that subscribe to and publish messages are called software sensors, and 
 
 ### Software Sensors
 
-A software sensor is a node in the Nomad network that takes zero or more input streams and shares messages in an output stream. Software sensors have a unique identity based on public / private keypairs, and produce signed messages that can be verifiably traced to the emitting sensor.
+A software sensor is a node in the Nomad network that takes zero or more input streams and shares messages in an output stream. Software sensors have a unique identity based on public / private keypairs, and produce signed messages that can be verifiably linked to the originating sensor.
 
 There are two types of software sensors: **Atomic** and **Composite**.
 
