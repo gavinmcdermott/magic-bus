@@ -1,7 +1,7 @@
 # Nomad - distributed near-realtime message streams for the planet
 
 ### Overview
-Nomad is distributed near-realtime message passing for the whole planet. Nomad is a data format built on IPFS and a Javascript module that makes it easy to subscribe to messages streams, compose and process incoming message data, and publish resulting messages to downstream subscribers. 
+Nomad is distributed near-realtime message passing for the whole planet. Nomad is a data format built on [IPFS](https://github.com/ipfs/ipfs) and a Javascript module that makes it easy to subscribe to messages streams, compose and process incoming message data, and publish resulting messages to downstream subscribers. 
 
 Devices that subscribe to and publish messages are called software sensors, and together form a distributed global network that processes and shares meaningful interpretation of raw data. Raw data can come from any source, including environmental sensors (temperature, sound, humidity, etc), APIs, databases, or datasets. 
 
