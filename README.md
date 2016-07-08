@@ -1,4 +1,4 @@
-# The MagicBus
+# MagicBus
 
 ### Overview
 MagicBus is a thin layer that sits on top of IPFS with the aim of creating a ‘living network of meaning’. The MagicBus protocol allows nodes to quickly and easily subscribe to messages or data streams, compose and process that data, then publish a resulting data stream or message to any downstream subscribers.
