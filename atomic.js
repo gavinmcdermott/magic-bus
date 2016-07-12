@@ -16,8 +16,11 @@ let message = (channel) => {
 }
 
 NomadPub.init().then((channel) => {
-	let run = intervalStream(1000, channel).map(message)
-	run.observe(NomadPub.publish)
+	// let run = intervalStream(10000, channel).map(message)
+
+	// run.observe(NomadPub.publish)
+	console.log('done with init')
+	return NomadPub.publish({'hello': 'cat'})
 }).catch((err) => {
 	console.log('e: ', err)
 })
