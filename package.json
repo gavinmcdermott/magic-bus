@@ -20,6 +20,7 @@
     "ipfs-api": "6.0.3",
     "ipfs-merkle-dag": "^0.6.0",
     "lodash": "4.13.1",
+    "most": "^0.19.7",
     "rimraf": "2.5.2"
   }
 }
