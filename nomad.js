@@ -183,19 +183,23 @@ let publishData = (head, message) => {
       let result = Object.assign({}, dataWrapper)
       return Promise.all([ipfs.object.put(result.newHeadObject), Promise.resolve(result)])
     })
-    .then((results) => {
-      let data = results[0]
-      let dataWrapper = results[1]
-      let result = Object.assign({}, dataWrapper)
-      result.newHeadObject = data
-      // update the name
-      headObjectHash = data.toJSON().Hash
-      return Promise.all([ipfs.name.publish(headObjectHash), Promise.resolve(result)])
-    })
+    // publish the name
+    //
+    // .then((results) => {
+    //   let data = results[0]
+    //   let dataWrapper = results[1]
+    //   let result = Object.assign({}, dataWrapper)
+    //   result.newHeadObject = data
+    //   // update the name
+    //   headObjectHash = data.toJSON().Hash
+    //   return Promise.all([ipfs.name.publish(headObjectHash), Promise.resolve(result)])
+    // })
+    //
     .then((results) => {
       console.log('next Hash published: ', headObjectHash)
       let data = results[0]
       let dataWrapper = results[1]
+      headObjectHash = data.toJSON().Hash
       let result = Object.assign({}, dataWrapper)
       return result
     })
