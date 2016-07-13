@@ -2,7 +2,7 @@
 
 import most from 'most'
 
-import { NomadPub } from './nomad'
+import NomadPub from './nomad'
 
 // returns periodic stream that fires every millis
 // and resolves to channel
@@ -17,10 +17,12 @@ let message = (channel) => {
 
 NomadPub.init().then((channel) => {
 	// let run = intervalStream(10000, channel).map(message)
-
 	// run.observe(NomadPub.publish)
-	console.log('done with init')
+  console.log('done with init')
+	console.log('------------------------------')
 	return NomadPub.publish({'hello': 'cat'})
+}).then((d) => {
+  console.log('PUBLISHED!', d)
 }).catch((err) => {
-	console.log('e: ', err)
+	console.log('INIT ERR: ', err)
 })

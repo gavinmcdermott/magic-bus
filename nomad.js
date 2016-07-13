@@ -1,118 +1,215 @@
 'use strict'
 
 import R from 'ramda'
-
 import ipfsApi from 'ipfs-api'
 import { DAGLink } from 'ipfs-merkle-dag'
 import bs58 from 'bs58'
+
+
+
+// /////////////////////////////////////////
+// Notes:
+// /////////////////////////////////////////
+//
+// Nodes need to publish something first, or they will error with this message: 'Could not resolve name'
+//
+//
+//
+// /////////////////////////////////////////
+
+
+
 
 const ipfs = ipfsApi()
 let channel = null
 let headObjectHash = null
 
-// returns a promise that resolves to the channel name
-let init = () => {
-	// let promise = new Promise((resolve, reject) => {})
-	return getChannel().then((nodeId) => {
-		channel = nodeId.ID
-		console.log('channel id: ', channel)
-		return getHeadObject(channel)
-	}).then((hash) => {
-		console.log('head object hash: ', hash)
-		headObjectHash = hash
-		return channel
-	}).catch((err) => {
-		let ourErr = new Error()
-		ourErr.msg = "Connect error, IPFS dameon doesn't appear to be running. Try ipfs daemon first"
-		throw (ourErr)
-	})
-}
+
+
+
+// IPFS Helpers
 
 // returns a promise that resolves to ipfs node id
 // which is hash of public key. We use this as
 // the software sensor's channel string
 let getChannel = () => {
-	return ipfs.id()
-}
-
-// returns a promise
-let publish = (message) => {
-	return newObject(headObjectHash, message)
+  return ipfs.id()
 }
 
 // returns promise that resolves to the current
 // head object of the message linked list
-let getHeadObject = () => {
-	return ipfs.name.resolve((data) => {
-		return data.Path
-	})
+let resolveChannelToCurrentHead = (channel) => {
+  return ipfs.name.resolve(channel)
 }
 
-// returns promise that resolves to object sie
-let objectDataSize = (objectHash) => {
-	return ipfs.object.data(objectHash).then((data) => {
-		return data.length
-	})
+// let getObjectDataLength = (ipfsObjData) => {
+//   return Promise.resolve(data.length)
+// }
+
+// returns promise that resolves to object size
+let getDataForObject = (objectHash) => {
+  return ipfs.object.data(objectHash)
 }
+
+// returns promise that resolves to a new empty object
+let getNewTemplateObject = () => {
+  return ipfs.object.new()
+}
+
+let addDataToIPFS = (string) => {
+  if (R.type(string) !== 'String') {
+    string = JSON.stringify(string)
+  }
+  return ipfs.add(new Buffer(string, 'utf8'))
+}
+
+
+
+
+
+
+// returns a promise that resolves to the channel name
+let init = () => {
+  // let promise = new Promise((resolve, reject) => {})
+  return getChannel().then((nodeId) => {
+    channel = nodeId.ID
+    console.log('channel id: ', channel)
+    return resolveChannelToCurrentHead(channel)
+  }).then((data) => {
+    headObjectHash = R.replace('\/ipfs\/', '', data.Path)
+    console.log('head object hash: ', headObjectHash)
+    return channel
+  }).catch((err) => {
+    let ourErr = new Error()
+    ourErr.msg = "Connect error, IPFS dameon doesn't appear to be running. Try ipfs daemon first"
+    console.log(err)
+    throw (ourErr)
+  })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // returns promise that resolves when object
-// is published. 
-let newObject = (head, dataObject) => {
-	debugger
-	if (channel === null) {
-		return Promise.reject("IPFS isn't connected, you need to call init() first")
-	}
+// is published.
+let publishData = (head, message) => {
+  if (channel === null) {
+    return Promise.reject("IPFS isn't connected, you need to call init() first")
+  }
 
-	if (R.isNil(dataObject)) {
-		return Promise.reject("message object can't be undefined or null")
-	}
+  if (R.isNil(message)) {
+    return Promise.reject("message object can't be undefined or null")
+  }
 
-	console.log('line 68')
-	let pointerObjectHash
-	// create empty IPFS object. This will point to new message file and
-	// to head pointer object of existing messages linked list
-	return ipfs.object.new()
-	.then((data) => {
-		pointerObjectHash = data.toJSON().Hash
-		let message = JSON.stringify(dataObject)
-		console.log('adding new message: ', message)
-		console.log(typeof message)
-		return ipfs.add(new Buffer(message.toString(), 'utf8'))
-	})
-	// .then((data) => {
-	//   let fileHash = data[0].path
-	//   let node = data[0].node
+  let publishObject = {
+    oldHeadObjectHash: headObjectHash,
+    oldHeadObjectDataSize: null,
+    newHeadObject: null,
+    newHeadObjectHash: null,
+    newDataObject: null
+  }
 
-	//   let fileLink = new DAGLink('file', node.data.length, new Buffer(bs58.decode(fileHash)))
-	//   console.log('patching with file link')
-	//   return ipfs.object.patch.addLink(new Buffer(bs58.decode(pointerObjectHash)), fileLink)
-	// })
-	// .then(() => {
-	// 	console.log('getting head object size')
-	// 	return objectDataSize(headObjectHash)
-	// })
-	// .then((headObjectSize) => {
-	//   let peerLink = new DAGLink('peer', headObjectSize, new Buffer(bs58.decode(headObjectHash)))
-	//   console.log('patching with peer object link')
-	//   return ipfs.object.patch.addLink(new Buffer(bs58.decode(pointerObjectHash)), peerLink)
-	// })
-	// .then((data) => {
-	// 	headObjectHash = data.Hash
-	// 	console.log('putting: ', data)
-	// 	console.log('puttig new object')
-	// 	return ipfs.object.put(data)
-	// })
-	.catch((e) => {
-	  console.log('e', e)
-	})
+
+  return getNewTemplateObject()
+    .then((data) => {
+      let result = Object.assign({}, publishObject)
+      result.newHeadObject = data
+      result.newHeadObjectHash = data.toJSON().Hash
+      return result
+    })
+    .then((dataWrapper) => {
+      let result = Object.assign({}, dataWrapper)
+      let hash = result.newHeadObjectHash
+      return Promise.all([getDataForObject(new Buffer(bs58.decode(hash))), Promise.resolve(result)])
+    })
+    .then((results) => {
+      let data = results[0]
+      let dataWrapper = results[1]
+      let result = Object.assign({}, dataWrapper)
+      result.oldHeadObjectDataSize = data.length
+      return result
+    })
+    .then((dataWrapper) => {
+      let result = Object.assign({}, dataWrapper)
+      return Promise.all([addDataToIPFS(message), Promise.resolve(result)])
+    })
+    .then((results) => {
+      let data = results[0]
+      let dataWrapper = results[1]
+      let result = Object.assign({}, dataWrapper)
+      result.newDataObject = R.head(data)
+      return result
+    })
+    .then((dataWrapper) => {
+      let result = Object.assign({}, dataWrapper)
+      let node = result.newDataObject.node.toJSON()
+      let path = result.newDataObject.path
+      let fileLink = new DAGLink('file', node.Data.length, new Buffer(bs58.decode(path)))
+      return Promise.all([ipfs.object.patch.addLink(new Buffer(bs58.decode(result.newHeadObjectHash)), fileLink), Promise.resolve(result)])
+    })
+    .then((results) => {
+      let data = results[0]
+      let dataWrapper = results[1]
+      let result = Object.assign({}, dataWrapper)
+      result.newHeadObject = data
+      return result
+    })
+    .then((dataWrapper) => {
+      let result = Object.assign({}, dataWrapper)
+      let peerLink = new DAGLink('peer', result.oldHeadObjectDataSize, new Buffer(bs58.decode(result.oldHeadObjectHash)))
+      return Promise.all([ipfs.object.patch.addLink(new Buffer(bs58.decode(result.newHeadObject.toJSON().Hash)), peerLink), Promise.resolve(result)])
+    })
+    .then((results) => {
+      let data = results[0]
+      let dataWrapper = results[1]
+      let result = Object.assign({}, dataWrapper)
+      result.newHeadObject = data
+      return result
+    })
+    .then((dataWrapper) => {
+      let result = Object.assign({}, dataWrapper)
+      return Promise.all([ipfs.object.put(result.newHeadObject), Promise.resolve(result)])
+    })
+    .then((results) => {
+      let data = results[0]
+      let dataWrapper = results[1]
+      let result = Object.assign({}, dataWrapper)
+      result.newHeadObject = data
+      return result
+    })
 }
 
-export let NomadPub = {
-	init,
-	publish
+
+
+
+
+
+let publish = (message) => {
+  return publishData(headObjectHash, message)
 }
 
-// newObject(12345, '{"hello":"cat"}')
-// .then((rep) => {
-// 	console.log('success: ', rep)
-// })
+
+
+
+
+
+
+
+
+export default {
+  init,
+  publish
+}
