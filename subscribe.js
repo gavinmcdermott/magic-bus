@@ -2,7 +2,7 @@
 
 import NomadSub from './nomad-sub-mock'
 
-let channel1 = 'QmYcbm7GPAd3S7nSSrsxuyxef9KQ7fR3SkTmLcWX9BdN8y'
+let channel1 = 'Qmf8Ps1gfrkDRXjF2vsBwEbThczvPepSzXUA3yh64aSVD6'
 
 // returns a stream
 let stream1 = NomadSub.subscribe(channel1)

@@ -24,17 +24,17 @@ let subscribe = (channel) => {
 	// notification stream elements resolve to head object hashes
 
 	// get message data from IPFS object hash and wraps in most stream
-	let objectHashToSingleMessageStream = (objectHash) => {
-		return most.fromPromise(getMessageFromPointer(objectHash))
+	let channelToMessageStream = (c) => {
+		return most.fromPromise(getFirstMessageChannel(c))
 	}
 
-	return notificationStream.chain(objectHashToSingleMessageStream).map(JSON.stringify)
+	return notificationStream.chain(channelToMessageStream).map(JSON.stringify)
 }
 
 // given a channel name (ie IPFS node id) returns
 // a stream that emits whenever there's a new message
 let getNotificationStream = (channel) => {
-	return most.periodic(3000, 'Qme88LV7Eyd8aZhieyh5aUmGWHNXtSYNeJaQo4r2G4EAD6')
+	return most.periodic(3000, channel)
 }
 
 ///////// FUNCTIONS THAT SHOULD BE ABSTRACTED IN A COMMON IPFS MODULE, PROBABLY ///////////
@@ -62,11 +62,19 @@ let getFile = (path) => {
 	})
 }
 
-// hash of pointer object -> promise that resolves to message
-let getMessageFromPointer = (hash) => {
+// returns promise that resolves to the current
+// head object of the message linked list
+let resolveChannelToCurrentHead = (channel) => {
+  return ipfs.name.resolve(channel)
+}
+
+// hash of nodeid (ie channel) -> promise that resolves to most
+// recent message
+let getFirstMessageChannel = (hash) => {
 	let getFileLink = linkNamed('file')
 
 	return R.pipeP(
+		resolveChannelToCurrentHead,
 		getLinks, 
 		getFileLink, 
 		R.prop('hash'),
@@ -74,12 +82,6 @@ let getMessageFromPointer = (hash) => {
 		getFile, 
 		toString)
 	(hash)
-}
-
-// returns promise that resolves to the current
-// head object of the message linked list
-let resolveChannelToCurrentHead = (channel) => {
-  return ipfs.name.resolve(channel)
 }
 
 /////////////////////////////////////////////////////////////////////////////////
