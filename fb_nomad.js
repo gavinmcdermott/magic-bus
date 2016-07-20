@@ -3,6 +3,7 @@
 import firebase from 'firebase'
 import most from 'most'
 import R from 'ramda'
+import EventEmitter from 'events'
 
 import config from './fb_config'
 
@@ -12,22 +13,17 @@ let subs = {}
 let pub = {}
 
 const initPublisher = (config) => {
-  pub[config.nodeId] = {}
-  let ref = pub.ref = relayConnections.ref(config.nodeId)
-  // pub.stream = most.fromPromise(ref.limitToLast(1).on('child_added', (snapshot) => {
-  //   console.log('PUBLISHED', snapshot.val())
-  //   console.log('===================================')
-  //   return snapshot.val()
-  // }))
+  const nodeId = config.nodeId
+  pub[nodeId] = {}
+  let ref = pub.ref = relayConnections.ref(nodeId)
 
   // hack for firebase test
   const genTimeStamp = () => {
     let timestamp = new Date().toString()
     let volume = Math.random()
-    return ref.push({ timestamp, volume })
+    return ref.set({ latest: { timestamp, volume,  node: nodeId } })
   }
-  const observable = most.periodic(3000, genTimeStamp)
-  observable.observe((f) => f())
+  most.periodic(3000, genTimeStamp).observe((fn) => fn())
   // end hack for firebase test
 
   return pub
@@ -37,37 +33,39 @@ const initSubscribers = (config) => {
   R.forEach((subId) => {
     let sub = subs[subId] = {}
     let ref = sub.ref = relayConnections.ref(subId)
-    sub.stream = most.fromPromise(ref.limitToLast(1).on('child_added', (snapshot) => {
-      // console.log('SUBSCRIBED', snapshot.val())
-      // console.log('===================================')
-      return snapshot.val()
-    }))
+    let em = new EventEmitter()
+
+    ref.limitToLast(1).once('value', (snapshot) => {
+      em.emit('value', snapshot.val())
+    })
+
+    ref.limitToLast(1).on('value', (snapshot) => {
+      em.emit('value', snapshot.val())
+    })
+
+    sub.stream = most.fromEvent('value', em)
   }, config.subIds)
+
   return subs
 }
 
-const composeStreams = (subss) => {
+const composeStreams = (subs) => {
   let values = R.values(subs)
-  // console.log(subs)
-  let streamLens = R.lensProp('stream');
-  // console.log(streamLens)
-  let foo = R.map(streamLens, values)
-  console.log('composables!', foo)
-  // let streams = R.view(streamLens, subs)
-  // console.log('composing', streams)
-  let combined = most.combineArray((v) => { console.log('now composed') }, foo)
-  let joined = most.join(combined)
-  joined.observe((f) => {
-    console.log('in observe; ', f)
-  })
+  let streamLens = R.prop('stream')
+  let streams = R.map((value) => streamLens(value), values)
+
+  most.combineArray((...theArgs) => theArgs, streams)
+    .observe((value) => {
+      console.log('composed > ', value)
+    })
 }
 
 const internalInit = (config) => {
   firebase.initializeApp({ databaseURL: config.relayUrl })
   relayConnections = firebase.database()
   initPublisher(config)
-  let ns = initSubscribers(config)
-  composeStreams(ns)
+  let subscribers = initSubscribers(config)
+  composeStreams(subscribers)
 }
 
 const value = () => {
