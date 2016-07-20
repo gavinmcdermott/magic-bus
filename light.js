@@ -33,4 +33,8 @@ let initSensor = () => {
 	})
 }
 
-initSensor().then(console.log)
+initSensor().then(() => {
+	return readSensor()
+}).then((reading) => {
+	console.log(reading)
+})
