@@ -9,7 +9,9 @@ let readSensor = () => {
 			if (error) {
 				reject(error)
 			} else {
-				let decimal = parseInt(stdout.toString(), 16)
+				let rep = stdout.toString()
+				console.log(rep)
+				let decimal = parseInt(rep, 16)
 				resolve(decimal)
 			}
 		})	
