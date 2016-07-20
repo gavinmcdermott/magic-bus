@@ -1,14 +1,41 @@
 'use strict'
 
+import R from 'ramda'
 import nomad from './fb_nomad'
 
 nomad.init()
 
 nomad.stream().observe((data) => {
-  console.log('data on composed observation: ==> ', data)
-  // nomad.publish({ composed: data }).catch((err) => {
-  //   console.log(err)
-  // })
+
+  // let acceptableTimeWindow = 3000 // 3 seconds
+  let acceptableTimeWindow = 3000000 // lots of seconds for testing
+  let lightThreshold = 52
+
+  const lightData = R.find(R.propEq('type', 'light'), data)
+  const lightVal = R.prop('value', lightData)
+  const lightTime = new Date(R.prop('time', lightData))
+
+  const soundData = R.find(R.propEq('type', 'sound'), data)
+  const soundVal = R.prop('value', soundData)
+  const soundTime = new Date(R.prop('time', soundData))
+
+  if (!lightVal || !soundVal || !lightTime || !soundTime) return
+
+  let withinTimeRange = Math.abs(soundTime - lightTime) <= acceptableTimeWindow
+  let exceededLightThreshold = lightVal >= lightThreshold
+
+  if (withinTimeRange && exceededLightThreshold) {
+    let explosionData = {
+      source: [soundData, lightData],
+      time: new Date().toString(),
+      explosion: true,
+    }
+    // console.log('BOOM!!!')
+    // console.log('')
+    nomad.publish(explosionData).catch((err) => {
+      console.log('publish error: ', err)
+    })
+  }
 })
 
 

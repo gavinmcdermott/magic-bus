@@ -49,13 +49,19 @@ const initSubscribers = (config) => {
     let ref = sub.ref = relayConnections.ref(subId)
     let em = new EventEmitter()
 
-    ref.limitToLast(1).once('value', (snapshot) => {
+    ref.once('value', (snapshot) => {
       let val = snapshot.val() || null
+      if (val) {
+        val.type = subId
+      }
       em.emit('value', val)
     })
 
-    ref.limitToLast(1).on('value', (snapshot) => {
+    ref.on('value', (snapshot) => {
       let val = snapshot.val() || null
+      if (val) {
+        val.type = subId
+      }
       em.emit('value', val)
     })
 
