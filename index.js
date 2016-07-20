@@ -4,10 +4,18 @@ import nomad from './fb_nomad'
 
 nomad.init()
 
-nomad.streamAll().observe((v) => console.log('>>>', v))
+nomad.stream().observe((v) => console.log('>>>', v))
 
 
+nomad.publish({ foo: { bar: 123 }}).catch((err) => {
+  console.log(err)
+})
 
+
+// pondernigs for api
+// nomad.tap(<stream>) => taps the single stream
+// nomad.stream() => streams all
+// nomad.publish() => streams all
 
 
 
