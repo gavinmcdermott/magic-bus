@@ -1,5 +1,5 @@
 {
-  "nodeId": "explosion",
+  "nodeId": "twilio",
   "relayUrl": "https://nomad-53910.firebaseio.com",
-  "subIds": ["light", "sound"]
+  "subIds": ["explosion"]
 }

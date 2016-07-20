@@ -2,47 +2,44 @@
 
 import R from 'ramda'
 import nomad from './fb_nomad'
+import Twilio from 'twilio'
+
+import { twilioSid, twilioToken, phones } from './twilioConf'
+let twilioClient = Twilio(twilioSid, twilioToken)
 
 nomad.init()
 
-nomad.stream().observe((data) => {
+nomad.stream().observe((list) => {
+  let acceptableTimeWindow = 30000 // need explosion to have happened in last 30 seconds.
+  let data = list[0]
+  let explosion = R.prop('explosion', data)
+  let eTime = R.prop('time', data)
 
-  // let acceptableTimeWindow = 3000 // 3 seconds
-  let acceptableTimeWindow = 3000000 // lots of seconds for testing
-  let lightThreshold = 52
+  let now = new Date()
 
-  const lightData = R.find(R.propEq('type', 'light'), data)
-  const lightVal = R.prop('value', lightData)
-  const lightTime = new Date(R.prop('time', lightData))
-
-  const soundData = R.find(R.propEq('type', 'sound'), data)
-  const soundVal = R.prop('value', soundData)
-  const soundTime = new Date(R.prop('time', soundData))
-
-  if (!lightVal || !soundVal || !lightTime || !soundTime) return
-
-  let withinTimeRange = Math.abs(soundTime - lightTime) <= acceptableTimeWindow
-  let exceededLightThreshold = lightVal >= lightThreshold
-
-  if (withinTimeRange && exceededLightThreshold) {
-    let explosionData = {
-      source: [soundData, lightData],
-      time: new Date().toString(),
-      explosion: true,
-    }
-    // console.log('BOOM!!!')
-    // console.log('')
-    nomad.publish(explosionData).catch((err) => {
-      console.log('publish error: ', err)
-    })
+  if (explosion === true && (now - new Date(eTime) <= acceptableTimeWindow)) {
+  	console.log ('EXPLOSION')
+  	R.forEach(notifyExplosion, phones)
   }
 })
 
+// doesn't return
+let sms = R.curry((body, from, to) => {
+	twilioClient.sendMessage({ to, from, body }, function(err, responseData) {
+		if (err) {
+			console.log('error sending with twilio: ', err)
+		}
+	})
+})
+
+let notifyExplosion = sms("There's been an explosion in the machine room!", '+16502499130')
 
 
-// pondernigs for api ??
-// nomad.tap(<stream>) => taps the single stream / array of streams / all streams
-// nomad.publish() => publishes the data
+
+
+
+
+
 
 
 
