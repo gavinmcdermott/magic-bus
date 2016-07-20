@@ -4,11 +4,7 @@ import nomad from './fb_nomad'
 
 nomad.init()
 
-nomad.value((values) => {
-
-})
-
-
+nomad.streamAll().observe((v) => console.log('>>>', v))
 
 
 

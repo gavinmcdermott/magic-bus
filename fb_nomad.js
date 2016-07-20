@@ -11,6 +11,7 @@ let relayConnections
 
 let subs = {}
 let pub = {}
+let subscriberStreams
 
 const initPublisher = (config) => {
   const nodeId = config.nodeId
@@ -36,11 +37,13 @@ const initSubscribers = (config) => {
     let em = new EventEmitter()
 
     ref.limitToLast(1).once('value', (snapshot) => {
-      em.emit('value', snapshot.val())
+      let val = snapshot.val() ? snapshot.val().latest : null
+      em.emit('value', val)
     })
 
     ref.limitToLast(1).on('value', (snapshot) => {
-      em.emit('value', snapshot.val())
+      let val = snapshot.val() ? snapshot.val().latest : null
+      em.emit('value', val)
     })
 
     sub.stream = most.fromEvent('value', em)
@@ -49,15 +52,10 @@ const initSubscribers = (config) => {
   return subs
 }
 
-const composeStreams = (subs) => {
-  let values = R.values(subs)
-  let streamLens = R.prop('stream')
-  let streams = R.map((value) => streamLens(value), values)
-
-  most.combineArray((...theArgs) => theArgs, streams)
-    .observe((value) => {
-      console.log('composed > ', value)
-    })
+const composeStreams = (subscriptions) => {
+  let streams = R.map(R.prop('stream'), R.values(subscriptions))
+  subscriberStreams = most.combineArray((...theArgs) => theArgs, streams)
+  return subscriberStreams
 }
 
 const internalInit = (config) => {
@@ -68,8 +66,8 @@ const internalInit = (config) => {
   composeStreams(subscribers)
 }
 
-const value = () => {
-
+const streamAll = () => {
+  return subscriberStreams
 }
 
 const externalInit = () => {
@@ -80,5 +78,5 @@ internalInit(config)
 
 module.exports = {
   init: externalInit,
-  value
+  streamAll
 }
