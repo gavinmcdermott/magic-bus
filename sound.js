@@ -4,8 +4,9 @@
 // echo cape-bone-iio > /sys/devices/bone_capemgr.*/slots
 
 
-
+import nomad from './fb_nomad'
 import { exec } from 'child_process'
+nomad.init()
 
 
 // returns a promise
@@ -23,5 +24,9 @@ let readSensor = () => {
 }
 
 setInterval(() => {
-	readSensor().then(console.log).catch((err) => console.log('e ', err))
+	readSensor().then((data) => {
+		nomad.publish({ sound: data, time: new Date().toString()}).catch((err) => {
+  		console.log(err)
+		})
+	}).catch((err) => console.log('e ', err))
 }, 1000)
