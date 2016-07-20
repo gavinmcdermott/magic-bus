@@ -1,5 +1,5 @@
 {
-  "nodeId": "Composed",
+  "nodeId": "composed",
   "relayUrl": "https://nomad-53910.firebaseio.com",
-  "subIds": ["Light", "Sound"]
+  "subIds": ["light", "sound"]
 }

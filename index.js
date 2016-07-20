@@ -6,11 +6,11 @@ nomad.init()
 
 nomad.stream().observe((data) => {
   console.log('data on composed observation: ==> ', data)
+  // nomad.publish({ composed: data }).catch((err) => {
+  //   console.log(err)
+  // })
 })
 
-// nomad.publish({ foo: { bar: 123 }}).catch((err) => {
-//   console.log(err)
-// })
 
 
 // pondernigs for api ??
