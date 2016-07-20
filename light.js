@@ -38,7 +38,7 @@ let initSensor = () => {
 initSensor().then(() => {
 	setInterval(() => {
 		readSensor().then((data) => {
-			nomad.publish({ light: { light: data, time: new Date().toString() } }).catch((err) => {
+			nomad.publish({ light: { value: data, time: new Date().toString() } }).catch((err) => {
 			  console.log(err)
 			})
 		})
