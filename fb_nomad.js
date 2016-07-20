@@ -11,22 +11,36 @@ let relayConnections
 
 let subs = {}
 let pub = {}
+let subscriberStreams
+let nodeId
 
 const initPublisher = (config) => {
-  const nodeId = config.nodeId
+  nodeId = config.nodeId
   pub[nodeId] = {}
-  let ref = pub.ref = relayConnections.ref(nodeId)
+  let ref = pub[nodeId].ref = relayConnections.ref(nodeId)
 
   // hack for firebase test
-  const genTimeStamp = () => {
-    let timestamp = new Date().toString()
-    let volume = Math.random()
-    return ref.set({ latest: { timestamp, volume,  node: nodeId } })
-  }
-  most.periodic(3000, genTimeStamp).observe((fn) => fn())
+  // const genTimeStamp = () => {
+  //   let timestamp = new Date().toString()
+  //   let volume = Math.random()
+  //   return ref.set({ latest: { timestamp, volume,  node: nodeId } })
+  // }
+  // most.periodic(3000, genTimeStamp).observe((fn) => fn())
   // end hack for firebase test
 
   return pub
+}
+
+const publish = (data) => {
+  if (R.isNil(data)) {
+    throw new Error('Dondé esta la data,señor Reid?')
+  }
+  return new Promise((resolve, reject) => {
+    pub[nodeId].ref.set(data, (err) => {
+      if (err) return reject(err)
+      return resolve()
+    })
+  })
 }
 
 const initSubscribers = (config) => {
@@ -36,11 +50,13 @@ const initSubscribers = (config) => {
     let em = new EventEmitter()
 
     ref.limitToLast(1).once('value', (snapshot) => {
-      em.emit('value', snapshot.val())
+      let val = snapshot.val() || null
+      em.emit('value', val)
     })
 
     ref.limitToLast(1).on('value', (snapshot) => {
-      em.emit('value', snapshot.val())
+      let val = snapshot.val() || null
+      em.emit('value', val)
     })
 
     sub.stream = most.fromEvent('value', em)
@@ -49,15 +65,10 @@ const initSubscribers = (config) => {
   return subs
 }
 
-const composeStreams = (subs) => {
-  let values = R.values(subs)
-  let streamLens = R.prop('stream')
-  let streams = R.map((value) => streamLens(value), values)
-
-  most.combineArray((...theArgs) => theArgs, streams)
-    .observe((value) => {
-      console.log('composed > ', value)
-    })
+const composeStreams = (subscriptions) => {
+  let streams = R.map(R.prop('stream'), R.values(subscriptions))
+  subscriberStreams = most.combineArray((...theArgs) => theArgs, streams)
+  return subscriberStreams
 }
 
 const internalInit = (config) => {
@@ -68,8 +79,8 @@ const internalInit = (config) => {
   composeStreams(subscribers)
 }
 
-const value = () => {
-
+const stream = () => {
+  return subscriberStreams
 }
 
 const externalInit = () => {
@@ -80,5 +91,6 @@ internalInit(config)
 
 module.exports = {
   init: externalInit,
-  value
+  publish,
+  stream
 }
