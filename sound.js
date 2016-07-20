@@ -10,7 +10,7 @@ import { exec } from 'child_process'
 
 // returns a promise
 let readSensor = () => {
-	let command = 'at /sys/devices/ocp.3/helper.15/AIN0'
+	let command = 'cat /sys/devices/ocp.3/helper.15/AIN0'
 	return new Promise((resolve, reject) => {
 		exec(command, (error, stdout, stderr) => {
 			if (error) {
@@ -23,5 +23,5 @@ let readSensor = () => {
 }
 
 setInterval(() => {
-	readSensor().then(console.log)
+	readSensor().then(console.log).catch((err) => console.log('e ', err))
 }, 1000)
