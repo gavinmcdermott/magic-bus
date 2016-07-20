@@ -19,13 +19,13 @@ let readSensor = () => {
 			} else {
 				resolve(parseInt(stdout.toString()))
 			}
-		})	
+		})
 	})
 }
 
 setInterval(() => {
 	readSensor().then((data) => {
-		nomad.publish({ sound: data, time: new Date().toString()}).catch((err) => {
+		nomad.publish({ value: data, time: new Date().toString() }).catch((err) => {
   		console.log(err)
 		})
 	}).catch((err) => console.log('e ', err))
