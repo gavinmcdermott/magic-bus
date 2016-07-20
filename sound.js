@@ -16,7 +16,7 @@ let readSensor = () => {
 			if (error) {
 				reject(error)
 			} else {
-				resolve(parseInit(stdout.toString()))
+				resolve(parseInt(stdout.toString()))
 			}
 		})	
 	})
