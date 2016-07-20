@@ -10,7 +10,6 @@ let readSensor = () => {
 				reject(error)
 			} else {
 				let rep = stdout.toString()
-				console.log(rep)
 				let decimal = parseInt(rep, 16)
 				resolve(decimal)
 			}
@@ -34,7 +33,9 @@ let initSensor = () => {
 }
 
 initSensor().then(() => {
-	return readSensor()
-}).then((reading) => {
-	console.log(reading)
+	setInterval(() => {
+		readSensor().then(console.log)
+	}, 1000)
+}).catch((err) => {
+	consoel.log('e: ', err)
 })
