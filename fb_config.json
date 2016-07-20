@@ -1,0 +1,5 @@
+{
+  "nodeId": "AAA",
+  "relayUrl": "https://nomad-53910.firebaseio.com",
+  "subIds": ["BBB", "CCC", "AAA"]
+}
