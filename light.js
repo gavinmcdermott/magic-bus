@@ -1,5 +1,8 @@
 import { exec } from 'child_process'
+import nomad from './fb_nomad'
 
+nomad.init()
+// nomad.stream().observe((v) => console.log('>>>', v))
 
 // returns a promise
 let readSensor = () => {
@@ -34,7 +37,11 @@ let initSensor = () => {
 
 initSensor().then(() => {
 	setInterval(() => {
-		readSensor().then(console.log)
+		readSensor().then((data) => {
+			nomad.publish({light: data, time: new Date().toString()}).catch((err) => {
+			  console.log(err)
+			})
+		})
 	}, 1000)
 }).catch((err) => {
 	consoel.log('e: ', err)
