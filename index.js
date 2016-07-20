@@ -4,18 +4,18 @@ import nomad from './fb_nomad'
 
 nomad.init()
 
-nomad.stream().observe((v) => console.log('>>>', v))
-
-
-nomad.publish({ foo: { bar: 123 }}).catch((err) => {
-  console.log(err)
+nomad.stream().observe((data) => {
+  console.log('data on composed observation: ==> ', data)
 })
 
+// nomad.publish({ foo: { bar: 123 }}).catch((err) => {
+//   console.log(err)
+// })
 
-// pondernigs for api
-// nomad.tap(<stream>) => taps the single stream
-// nomad.stream() => streams all
-// nomad.publish() => streams all
+
+// pondernigs for api ??
+// nomad.tap(<stream>) => taps the single stream / array of streams / all streams
+// nomad.publish() => publishes the data
 
 
 
