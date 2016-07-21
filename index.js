@@ -8,8 +8,10 @@ nomad.init()
 nomad.stream().observe((data) => {
 
   // let acceptableTimeWindow = 3000 // 3 seconds
-  let acceptableTimeWindow = 3000000 // lots of seconds for testing
-  let lightThreshold = 52
+  const acceptableTimeWindow = 3000000000 // lots of seconds for testing
+  const lightThreshold = 3000 // sensor units
+  const soundThreshold = 200 // sensor units
+
 
   const lightData = R.find(R.propEq('type', 'light'), data)
   const lightVal = R.prop('value', lightData)
@@ -23,11 +25,13 @@ nomad.stream().observe((data) => {
 
   let withinTimeRange = Math.abs(soundTime - lightTime) <= acceptableTimeWindow
   let exceededLightThreshold = lightVal >= lightThreshold
+  let exceededSoundThreshold = soundVal >= soundThreshold
 
-  if (withinTimeRange && exceededLightThreshold) {
+  if (withinTimeRange && exceededLightThreshold && exceededSoundThreshold) {
     let explosionData = {
-      source: [soundData, lightData],
+      // source: [soundData, lightData],
       time: new Date().toString(),
+      location: 'IDEO coLAB',
       explosion: true,
     }
     // console.log('BOOM!!!')
