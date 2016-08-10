@@ -1,3 +1,9 @@
+#### Warning: This repo is now deprecated!
+
+The work is being carried forward under [Project Nomad](https://github.com/IDEO-coLAB/nomad) as part of [IDEO coLAB](http://ideocolab.com/) research in dispersed computing.
+
+<hr />
+
 # Nomad - distributed near-realtime message streams for the planet
 
 ### Overview
