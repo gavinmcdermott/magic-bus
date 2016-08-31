@@ -1,0 +1,143 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  padding: 20px 50px;
+  margin: 0;
+  background-color: rgb(224,218,207);
+  font-family: 'helvetica', sans-serif;
+  font-weight: lighter;
+  color: #403e3e;
+}
+
+h1 {
+  text-align: center;
+  font-size: 60px;
+}
+
+h4 {
+  margin-bottom: 10px;
+  margin-top: 0px;
+}
+
+.divider {
+  height: 2px;
+  width: 85%;
+  margin: 0 auto;
+  border-bottom: 2px solid #ccc6bd;
+  margin-bottom: 50px;
+}
+
+.sensor-canvas {
+  position: relative;
+  min-height: 740px;
+  width: 100%;
+}
+
+.sensor-container {
+  position: absolute;
+  /*background-color: red;*/
+  height: 260px;
+  width: 600px;
+}
+
+.sensor-outer {
+  border-radius: 800px;
+  display: inline-block;
+  background-color: #58C2B6;
+  height: 260px;
+  width: 260px;
+  position: relative;
+}
+
+.sensor-data {
+  position: relative;
+  /*background-color: green;*/
+  height: 20px;
+  /*width: 20px;*/
+  top: 30px;
+  left: 300px;
+}
+
+.sensor-inner {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  height: 180px;
+  width: 180px;
+  border-radius: 300px;
+  background-color: rgb(224,218,207);
+}
+
+.sensor-inner.active {
+  background-color: #82d6cc;
+
+  -webkit-animation: fadeOut ease-out 1;  /* repeat it only 1 time */
+  -moz-animation: fadeOut ease-out 1;
+  animation: fadeOut ease-out 1;
+
+  -webkit-animation: greenToTan ease-out 1;
+  -moz-animation: greenToTan ease-out 1;
+  animation: greenToTan ease-out 1;
+
+  -webkit-animation-duration:.55s;
+  -moz-animation-duration:.55s;
+  animation-duration:.55s;
+
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.sensor-inner.active-alert {
+  background-color: #EE5B6D;
+
+  -webkit-animation: fadeOut ease-out 1;  /* repeat it only 1 time */
+  -moz-animation: fadeOut ease-out 1;
+  animation: fadeOut ease-out 1;
+
+  -webkit-animation: redToTan ease-out 1;
+  -moz-animation: redToTan ease-out 1;
+  animation: redToTan ease-out 1;
+
+  -webkit-animation-duration:3.3s;
+  -moz-animation-duration:3.3s;
+  animation-duration:3.3s;
+
+  -webkit-animation-fill-mode: forwards;
+  -moz-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+#light {
+  top: 30px;
+  left: 0px;
+}
+
+#sound {
+  bottom: 100px;
+  left: 0px;
+}
+
+#explosion {
+  top: calc(50% - (260px / 2));
+  right: 0px;
+}
+
+
+
+/* Animations */
+@-webkit-keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+@-moz-keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+@keyframes fadeOut { from { opacity:1; } to { opacity:0; } }
+
+@-webkit-keyframes greenToTan { from { background-color:#58C2B6; } to { background-color:#e0dacf; } }
+@-moz-keyframes greenToTan { from { background-color:#58C2B6; } to { background-color:#e0dacf; } }
+@keyframes greenToTan { from { background-color:#58C2B6; } to { background-color:#e0dacf; } }
+
+@-webkit-keyframes redToTan { from { background-color:#EE5B6D; } to { background-color:#e0dacf; } }
+@-moz-keyframes redToTan { from { background-color:#EE5B6D; } to { background-color:#e0dacf; } }
+@keyframes redToTan { from { background-color:#EE5B6D; } to { background-color:#e0dacf; } }

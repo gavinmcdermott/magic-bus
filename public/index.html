@@ -1,0 +1,55 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Nomad</title>
+  <!-- <link rel="stylesheet" href="bootstrap.min.css"></link> -->
+  <link rel="stylesheet" href="base.css"></link>
+</head>
+<body>
+
+  <div>
+    <h1>Nomad</h1>
+    <div class="divider"></div>
+  </div>
+
+  <div class="sensor-canvas">
+
+    <div class="sensor-container" id="light">
+      <div class="sensor-outer">
+        <div class="sensor-inner"></div>
+        <div class="sensor-data">
+          <h2>Ambient Light</h2>
+          <h4>Type: Atomic Sensor</h4>
+          <h4>Streaming Value: <span id="light-data"></span></h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="sensor-container" id="sound">
+      <div class="sensor-outer">
+        <div class="sensor-inner"></div>
+        <div class="sensor-data">
+          <h2>Ambient Noise</h2>
+          <h4>Type: Atomic Sensor</h4>
+          <h4>Streaming Value: <span id="sound-data"></span></h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="sensor-container" id="explosion">
+      <div class="sensor-outer">
+        <div class="sensor-inner"></div>
+        <div class="sensor-data">
+          <h2>Detect Explosion</h2>
+          <h4>Type: Composed Sensor</h4>
+          <h4>Streaming Value: <span id="explosion-data"></span></h4>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Load scripts -->
+  <script type="text/javascript" src="bundle.js"></script>
+</body>
+</html>
