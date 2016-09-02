@@ -16,7 +16,7 @@ let readSensor = () => {
 				let decimal = parseInt(rep, 16)
 				resolve(decimal)
 			}
-		})	
+		})
 	})
 }
 
@@ -31,14 +31,14 @@ let initSensor = () => {
 			} else {
 				resolve(stdout.toString())
 			}
-		})	
+		})
 	})
 }
 
 initSensor().then(() => {
 	setInterval(() => {
 		readSensor().then((data) => {
-			nomad.publish({light: data, time: new Date().toString()}).catch((err) => {
+			nomad.publish({ value: data, time: new Date().toString() }).catch((err) => {
 			  console.log(err)
 			})
 		})
