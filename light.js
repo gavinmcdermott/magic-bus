@@ -56,7 +56,7 @@ initSensor().then(() => {
 				})
 			}
 		})
-	}, 50)
+	}, 10)
 }).catch((err) => {
 	consoel.log('e: ', err)
 })
