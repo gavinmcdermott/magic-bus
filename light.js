@@ -1,6 +1,8 @@
 import { exec } from 'child_process'
 import nomad from './fb_nomad'
 
+const LIGHT_THRESHOLD = 750
+
 nomad.init()
 // nomad.stream().observe((v) => console.log('>>>', v))
 
@@ -36,17 +38,29 @@ let initSensor = () => {
 }
 
 initSensor().then(() => {
+	let lastReading = false
+	nomad.publish({ value: lastReading, time: new Date().toString() })
+
 	setInterval(() => {
 		readSensor().then((data) => {
-			nomad.publish({ value: data, time: new Date().toString() })
-			.then(() => {
-				console.log('sent: ', data)
-			})
-			.catch((err) => {
-			  console.log(err)
-			})
+			let reading = data > LIGHT_THRESHOLD
+
+			if (reading !== lastReading) {
+				lastReading = reading
+				nomad.publish({ value: lastReading, time: new Date().toString() })
+				.then(() => {
+					console.log('sent: ', lastReading)
+				})
+				.catch((err) => {
+				  console.log(err)
+				})
+			}
 		})
-	}, 500)
+	}, 50)
 }).catch((err) => {
 	consoel.log('e: ', err)
 })
+
+let threshold = (value, threshold) => {
+	return value > threshold
+}
