@@ -46,7 +46,7 @@ initSensor().then(() => {
 			  console.log(err)
 			})
 		})
-	}, 3000)
+	}, 500)
 }).catch((err) => {
 	consoel.log('e: ', err)
 })
